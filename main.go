@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"syscall"
 	"time"
 	"unsafe"
@@ -30,20 +31,28 @@ type consoleScreenBufferInfo struct {
 }
 
 func main() {
+	s := time.Now().Local()
 	t := time.NewTicker(100*time.Millisecond)
 	go func () {
 		cnt := 1
 		for {
 			<-t.C
 
-			cnt++
 			pos, _ := getCursorPos()
-			pos.Y -= 13
+
+			d := time.Now().Local().Sub(s).Milliseconds()
+			msg := fmt.Sprintf("\r%s please wait. %.1f sec", progress[cnt%len(progress)], float64(d)/1_000)
+
+			pos.Y -= int16(len(msg))
 			resetCursorPos(pos)
-			fmt.Printf("\r%s please wait.", progress[cnt%len(progress)])
+
+			fmt.Fprint(os.Stdout, msg)
+
+			cnt++
 		}
 	}()
 
+	// wait
 	fmt.Scanln()
 }
 
