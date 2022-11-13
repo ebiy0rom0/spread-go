@@ -48,6 +48,7 @@ func Start(msg *string) *timer {
 
 	t := time.NewTicker(100 * time.Millisecond)
 	go func() {
+		defer t.Stop()
 		cnt := 1
 		for {
 			select {
